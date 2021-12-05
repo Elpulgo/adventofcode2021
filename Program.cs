@@ -7,7 +7,7 @@ namespace Advent
         static void Main(string[] args)
         {
             Console.WriteLine("Advent for you!");
-            var day = new Day4.Day4();
+            var day = new Day5.Day5();
             day.Execute();
         }
 
