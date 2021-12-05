@@ -73,11 +73,33 @@ namespace Advent.Day5
 
             foreach (var line in input)
             {
+                // var positive = line.last.y - line.first.y == line.last.x - line.first.x;
+                // var negative = line.last.y - line.first.y == line.first.x - line.last.x;
+
                 var positive = line.last.y - line.first.y == line.last.x - line.first.x;
                 var negative = line.last.y - line.first.y == line.first.x - line.last.x;
 
                 Console.WriteLine($"{line.first.x}, {line.first.y} -> {line.last.x}, {line.last.y} # pos: {(positive ? "/" : "")} neg: {(negative ? "\\" : "")}");
 
+                if(positive || negative){
+                    var end = (line.last.x, line.last.y);
+                    int x = line.first.x, y = line.first.y;
+
+                    for(var i = 0; i < 1000; i++){
+                        coords.AddOrUpdate(x, y);
+                        if(positive){
+                            x += 1;
+                            y -= 1;
+                        }else{
+                            x += 1;
+                            y += 1;
+                        }
+
+                        if((x, y) == end){
+                            continue;
+                        } 
+                    } 
+                }
 // 8,0 -> 0,8  /
 // 6,4 -> 2,0  \
 
