@@ -89,28 +89,7 @@ var y2 = line.first.y > line.last.y ? line.first.y : line.last.y;
 
                 Console.WriteLine($"{line.first.x}, {line.first.y} -> {line.last.x}, {line.last.y} # pos: {(positive ? "/" : "")} neg: {(negative ? "\\" : "")}");
 
-                if(positive || negative){
-                    var end = (x2, y2);
-                    int x = x1, y = y1;
-
-                    for(var i = 0; i < 10; i++){
-                        
-                        if((x, y) == end){
-                          continue;
-                        } 
-                        coords.AddOrUpdate(x, y);
-                        if(positive){
-                            x += 1;
-                            y -= 1;
-                        }else{
-                            x += 1;
-                            y += 1;
-                        }
-
-                    } 
-
-                    continue;
-                }
+              
 // 8,0 -> 0,8  /
 // 6,4 -> 2,0  \
 
@@ -129,22 +108,67 @@ var y2 = line.first.y > line.last.y ? line.first.y : line.last.y;
                     continue;
                 }
 
-                for(var x = line.first.x; x <= line.last.x; x++)
+                if(line.first.y == line.last.y)
                 {
-                    if(coords.ContainsKey((x, line.first.y))){
-                        coords[(x, line.first.y)]++; 
-                        continue;
-                    }
+                    for(var x = line.first.x; x <= line.last.x; x++)
+                    {
+                        if(coords.ContainsKey((x, line.first.y))){
+                            coords[(x, line.first.y)]++; 
+                            continue;
+                        }
 
-                    coords[(x, line.first.y)] = 1;
+                        coords[(x, line.first.y)] = 1;
+                    }
+                    continue;
                 }
+
+                 var (start, end) = line.first.x < line.last.x
+                        ? (line.first, line.last)
+                        : (line.last, line.first);
+
+                        var direction = start.y < end.y
+                        ? 0
+                        : 1;
+                    
+                    int xd = start.x, yd = start.y;
+
+                    // for(var i = 0; i < 20; i++){
+                        while((xd, yd) != (end.x, end.y)){
+                            
+                            coords.AddOrUpdate(xd, yd);
+                            if(direction == 1){ // positive
+                                xd += 1;
+                                yd -= 1;
+                            }else{ // negative
+                                xd += 1;
+                                yd += 1;
+                            }
+                        }
+                    coords.AddOrUpdate(xd, yd);
+
+                        // if((xd, yd) == (end.x, end.y)){
+                          
+                        //   continue;
+                        // } 
+                        // coords.AddOrUpdate(xd, yd);
+                        // if(direction == 1){ // positive
+                        //     xd += 1;
+                        //     yd -= 1;
+                        // }else{ // negative
+                        //     xd += 1;
+                        //     yd += 1;
+                        // }
+
+                    // } 
+
             }
 
-            bool IsLinear((int x, int y) first, (int x, int y) last)
-                => first.x == last.x || first.y == last.y;
-            
-
             Console.WriteLine($"Part 1: {coords.Where(w => w.Value > 1).Count()}");
+
+            foreach (var a in coords)
+            {
+                Console.WriteLine($"{a.Key} - {a.Value}");
+            }
         }
 
         private void Part1(){
