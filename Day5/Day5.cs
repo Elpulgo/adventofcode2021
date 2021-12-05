@@ -49,50 +49,30 @@ namespace Advent.Day5
                 }
                 )
                 // .Where(w => w.first.x == w.last.x || w.first.y == w.last.y)  
-                // .Select(s =>
-                //     s.first.x == s.last.x
-                //     ?
-                //         s.first.y == new List<int>(){
-                //             s.first.y,
-                //             s.last.y
-                //         }.Min()
-                //             ? (s.first, s.last)
-                //             : (s.last, s.first)
-                //     :
-                //         s.first.x == new List<int>() {
-                //             s.first.x,
-                //             s.last.x
-                //         }.Min()
-                //         ? (s.first, s.last)
-                //         : (s.last, s.first)
-                // )
-                // .Select(s => (first: s.Item1, last: s.Item2))
+                .Select(s =>
+                    s.first.x == s.last.x
+                    ?
+                        s.first.y == new List<int>(){
+                            s.first.y,
+                            s.last.y
+                        }.Min()
+                            ? (s.first, s.last)
+                            : (s.last, s.first)
+                    :
+                        s.first.x == new List<int>() {
+                            s.first.x,
+                            s.last.x
+                        }.Min()
+                        ? (s.first, s.last)
+                        : (s.last, s.first)
+                )
+                .Select(s => (first: s.Item1, last: s.Item2))
                 .ToList();
 
             var coords = new Dictionary<(int, int), int>();
 
             foreach (var line in input)
             {
-                // var positive = line.last.y - line.first.y == line.last.x - line.first.x;
-                // var negative = line.last.y - line.first.y == line.first.x - line.last.x;
-// 8,0 -> 0,8  /
-// 8 - 0 == 0 - 8
-
-var x1 = line.first.x < line.last.x ? line.first.x : line.last.x;
-var x2 = line.first.x > line.last.x ? line.first.x : line.last.x;
-
-var y1 = line.first.y < line.last.y ? line.first.y : line.last.y;
-var y2 = line.first.y > line.last.y ? line.first.y : line.last.y;
-
-                var positive = y2 - y1 == x2 - x1;
-                var negative = y2 - y1 == x1 - x1;
-
-                Console.WriteLine($"{line.first.x}, {line.first.y} -> {line.last.x}, {line.last.y} # pos: {(positive ? "/" : "")} neg: {(negative ? "\\" : "")}");
-
-              
-// 8,0 -> 0,8  /
-// 6,4 -> 2,0  \
-
                 if (line.first.x == line.last.x)
                 {
                     for(var y = line.first.y; y <= line.last.y; y++)
