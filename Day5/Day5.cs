@@ -90,11 +90,14 @@ var y2 = line.first.y > line.last.y ? line.first.y : line.last.y;
                 Console.WriteLine($"{line.first.x}, {line.first.y} -> {line.last.x}, {line.last.y} # pos: {(positive ? "/" : "")} neg: {(negative ? "\\" : "")}");
 
                 if(positive || negative){
-                    var end = (line.last.x, line.last.y);
-                    int x = line.first.x, y = line.first.y;
+                    var end = (x2, y2);
+                    int x = x1, y = y1;
 
                     for(var i = 0; i < 10; i++){
                         
+                        if((x, y) == end){
+                          continue;
+                        } 
                         coords.AddOrUpdate(x, y);
                         if(positive){
                             x += 1;
@@ -104,9 +107,6 @@ var y2 = line.first.y > line.last.y ? line.first.y : line.last.y;
                             y += 1;
                         }
 
-                        if((x, y) == end){
-                            break;
-                        } 
                     } 
 
                     continue;
