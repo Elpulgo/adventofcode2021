@@ -75,7 +75,8 @@ namespace Advent.Day5
             {
                 // var positive = line.last.y - line.first.y == line.last.x - line.first.x;
                 // var negative = line.last.y - line.first.y == line.first.x - line.last.x;
-
+// 8,0 -> 0,8  /
+// 8 - 0 == 0 - 8
                 var positive = line.last.y - line.first.y == line.last.x - line.first.x;
                 var negative = line.last.y - line.first.y == line.first.x - line.last.x;
 
