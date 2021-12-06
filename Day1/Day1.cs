@@ -1,17 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using adventofcode2021;
 
 namespace Advent
 {
-    internal class Day1
+    internal class Day1 : BaseDay
     {
         internal void Execute()
         {
             Console.WriteLine("Day 1:");
 
-            var input = File
-                .ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), "Day1", "Day1.txt"))
+            var input = ReadInput(nameof(Day1))
                 .Select(s => Convert.ToInt32(s))
                 .ToList();
 
@@ -44,8 +44,8 @@ namespace Advent
                 }
             }
 
-            Console.WriteLine($"Part 1: {increasedPartOne}");
-            Console.WriteLine($"Part 2: {increasedPartTwo}");
+            FirstSolution(increasedPartOne.ToString());
+            SecondSolution(increasedPartTwo.ToString());
         }
     }
 }

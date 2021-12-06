@@ -3,30 +3,25 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using adventofcode2021;
 
 namespace Advent.Day5
 {
-    internal class Day5
+    internal class Day5: BaseDay
     {
         internal void Execute()
         {
             Console.WriteLine("Day 5:");
 
-            var isPartTwo = false;
-            var result = Execute(isPartTwo);
-            Console.WriteLine($"Part {(isPartTwo ? "2" : "1")}: {result}");
-
-            isPartTwo = true;
-            result = Execute(isPartTwo);
-            Console.WriteLine($"Part {(isPartTwo ? "2" : "1")}: {result}");
-
+            FirstSolution(Execute(isPartTwo: false).ToString());
+            SecondSolution(Execute(isPartTwo: true).ToString());
         }
 
         private int Execute(bool isPartTwo)
         {
             var coords = new Dictionary<(int, int), int>();
-            File
-                .ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), "Day5", "Day5.txt"))
+
+            ReadInput(nameof(Day5))
                 .ToList()
                 .Select(line =>
                 {

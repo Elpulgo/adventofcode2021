@@ -1,22 +1,18 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using adventofcode2021;
 
 namespace Advent.Day6
 {
-    internal class Day6
+    internal class Day6 : BaseDay
     {
         internal void Execute()
         {
             Console.WriteLine("Day 6:");
 
-            var isPartTwo = false;
-            var result = Execute(80);
-            Console.WriteLine($"Part {(isPartTwo ? "2" : "1")}: {result}");
-
-            isPartTwo = true;
-            result = Execute(256);
-            Console.WriteLine($"Part {(isPartTwo ? "2" : "1")}: {result}");
+            FirstSolution(Execute(80).ToString());
+            SecondSolution(Execute(256).ToString());
         }
 
         private ulong Execute(int days)

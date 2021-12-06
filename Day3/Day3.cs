@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using adventofcode2021;
 
 namespace Advent
 {
-    internal class Day3
+    internal class Day3 : BaseDay
     {
         internal void Execute()
         {
             Console.WriteLine("Day 3:");
 
-            var input = File
-                .ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), "Day3", "Day3.txt"))
+            var input = ReadInput(nameof(Day3))
                 .Select(s => Array
                     .ConvertAll(s.Trim().ToCharArray(), c => c - '0')
                     .ToList()

@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using adventofcode2021;
 
 namespace Advent.Day4
 {
-    internal class Day4
+    internal class Day4: BaseDay
     {
         internal void Execute()
         {
             Console.WriteLine("Day 4:");
             
-            var input = File
-                .ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), "Day4", "Day4.txt"))
+            var input = ReadInput(nameof(Day4))
                 .ToList();
 
             var bingoSequence = input
@@ -48,14 +48,14 @@ namespace Advent.Day4
             if (winningBingoBrick == null)
                 throw new Exception("No brick won the bingo!");
 
-            Console.WriteLine($"Part 1: {winningBingoBrick.ComputeWinningData()}");
+            FirstSolution(winningBingoBrick.ComputeWinningData().ToString());
 
             var lastBingoBrick = bricks
                .Where(w => w.BingoData.Bingo)
                .OrderBy(o => o.BingoData.Count)
                .LastOrDefault();
 
-            Console.WriteLine($"Part 2: {lastBingoBrick.ComputeWinningData()}");
+            SecondSolution(lastBingoBrick.ComputeWinningData().ToString());
         }
     }
 
