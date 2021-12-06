@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -15,9 +13,13 @@ namespace Advent.Day6
             var isPartTwo = false;
             var result = Execute(80);
             Console.WriteLine($"Part {(isPartTwo ? "2" : "1")}: {result}");
+
+            isPartTwo = true;
+            result = Execute(256);
+            Console.WriteLine($"Part {(isPartTwo ? "2" : "1")}: {result}");
         }
 
-        private int Execute(int days)
+        private ulong Execute(int days)
         {
             var initialLanternFish = File
                .ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "Day6", "Day6.txt"))
@@ -25,49 +27,35 @@ namespace Advent.Day6
                .Select(s => Convert.ToInt32(s))
                .ToList();
 
-            var fishs = initialLanternFish.Select(initalTimerCount => new LanternFish(initalTimerCount)).ToList();
+            var ages = new ulong[9];
+
+            foreach (var fish in initialLanternFish)
+            {
+                ages[fish]++;
+            }
 
             foreach (var day in Enumerable.Range(0, days))
             {
-                var newFishThisDay = new List<LanternFish>();
+                var spawnFish = ages[0];
+                var resetFish = ages[0];
 
-                foreach (var fish in fishs)
+                for (var index = 0; index < ages.Length - 1; index++)
                 {
-                    newFishThisDay.Add(fish.ComputeDay());
+                    ages[index] = ages[index + 1];
                 }
 
-                fishs.AddRange(newFishThisDay.Where(w => w != null).ToArray());
+                ages[8] = spawnFish;
+                ages[6] += resetFish;
             }
 
-            return fishs.Count;
-        }
-    }
+            ulong spawned = 0;
 
-    internal class LanternFish
-    {
-        private const int ResetTimerValue = 6;
-        private int _timer = 0;
-        public LanternFish()
-        {
-            _timer = 8;
-        }
-        public LanternFish(int initialTimer)
-        {
-            _timer = initialTimer;
-        }
-
-        public LanternFish ComputeDay()
-        {
-            if (_timer == 0)
+            for (var i = 0; i <= 8; i++)
             {
-                _timer = ResetTimerValue;
-                return new LanternFish();
+                spawned += ages[i];
             }
 
-            _timer--;
-
-            return null;
+            return spawned;
         }
-
     }
 }
