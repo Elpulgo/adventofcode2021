@@ -1,0 +1,1 @@
+/home/oscar/projects/adventofcode2021/rustadvent/target/debug/rustadvent: /home/oscar/projects/adventofcode2021/rustadvent/src/../../Day1/apa1.txt /home/oscar/projects/adventofcode2021/rustadvent/src/../../Day1/day1.rs /home/oscar/projects/adventofcode2021/rustadvent/src/main.rs
