@@ -8,7 +8,9 @@ pub fn execute(){
         .map(|n| n.parse::<u32>().expect("nope"))
         .collect::<Vec<_>>();
 
-    
+    let mut incresead = 0;
+    input.iter(|i| i > input[i])
+
     for elem in input {
         println!("{:?}", elem);
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using adventofcode2021.Day2;
+using adventofcode2021.Day8;
 
 namespace Advent
 {
@@ -8,7 +9,7 @@ namespace Advent
         static void Main(string[] args)
         {
             Console.WriteLine("Advent for you!");
-            var day = new Day2();
+            var day = new Day8();
             day.Execute();
         }
 
