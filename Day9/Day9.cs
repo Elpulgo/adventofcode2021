@@ -30,7 +30,10 @@ namespace adventofcode2021.Day9
             {
                 for (int y = 0; y < lines.Length; y++)
                 {
-                    var value = input[(x, y)];
+                    var value = input[(x, y)];                       
+
+                    if (visited.Contains((x, y)) || value == 9)
+                        continue;
 
                     if (
                         IsLower(FindValue(x, y - 1), value) &&
