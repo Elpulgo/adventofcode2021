@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,12 +12,11 @@ namespace adventofcode2021.Day9
         internal void Execute()
         {
             Console.WriteLine("Day 9:");
-
+            
             var lines = ReadInput(nameof(Day9));
-
             var input = lines
                 .Select(s => s.ToCharArray())
-                .SelectMany((s, i) => s.Select((p, columnIndex) => new KeyValuePair<(int X, int Y), (int Value, List<(int, int)> Neighbours)>((columnIndex, i), (Convert.ToInt32(p - '0'), new List<(int, int)>()))))
+                .SelectMany((s, i) => s.Select((p, columnIndex) => new KeyValuePair<(int X, int Y), int>((columnIndex, i), Convert.ToInt32(p - '0'))))
                 .ToDictionary(d => d.Key, d => d.Value);
 
             _rowLength = lines.First().Length;
@@ -25,32 +24,25 @@ namespace adventofcode2021.Day9
 
             var riskLevel = 0;
             var basins = new List<int>();
+            var visisted = new HashSet<(int X, int Y)>();
 
-            for (int y = 0; y < lines.Length; y++)
+            for (int x = 0; x < lines.First().Length; x++)
             {
-                for (int x = 0; x < lines.First().Length; x++)
+                for (int y = 0; y < lines.Length; y++)
                 {
-                    var value = input[(x, y)].Value;
-
-                    int?
-                        top = FindValue(x, y - 1),
-                        down = FindValue(x, y + 1),
-                        left = FindValue(x - 1, y),
-                        right = FindValue(x + 1, y);
+                    var value = input[(x, y)];
 
                     if (
-                        IsLower(top, value) &&
-                        IsLower(down, value) &&
-                        IsLower(left, value) &&
-                        IsLower(right, value))
+                        IsLower(FindValue(x, y - 1), value) &&
+                        IsLower(FindValue(x, y + 1), value) &&
+                        IsLower(FindValue(x - 1, y), value) &&
+                        IsLower(FindValue(x + 1, y), value))
                     {
                         riskLevel += (value + 1);
 
                         var basinCount = 1;
-                        var visisted = new HashSet<(int X, int Y)>();
                         visisted.Add((x, y));
                         basinCount += BasinCount(x, y, input, Direction.None, visisted);
-
                         basins.Add(basinCount);
                     }
 
@@ -59,33 +51,32 @@ namespace adventofcode2021.Day9
 
                     int? FindValue(int x, int y)
                      => input.TryGetValue((x, y), out var downFound)
-                            ? downFound.Value
+                            ? downFound
                             : null;
                 }
             }
 
             FirstSolution(riskLevel.ToString());
             SecondSolution(basins.OrderByDescending(o => o).Take(3).Aggregate((a, b) => a * b).ToString());
-
         }
 
         private int BasinCount(
             int x,
             int y,
-            Dictionary<(int X, int Y), (int Value, List<(int, int)> Neighbours)> input,
+            Dictionary<(int X, int Y), int> input,
             Direction directionToSkip,
             HashSet<(int X, int Y)> visited)
         {
             var basinCount = 0;
 
             if (directionToSkip != Direction.Down)
-                basinCount += Basins(x, y, Direction.Down, input, visited);
+                basinCount += Basins(x, y, Direction.Top, input, visited, (x, y) => y < _columnLength - 1, (x, y) => (x, y + 1));
             if (directionToSkip != Direction.Right)
-                basinCount += Basins(x, y, Direction.Right, input, visited);
+                basinCount += Basins(x, y, Direction.Left, input, visited, (x, y) => x < _rowLength - 1, (x, y) => (x + 1, y));
             if (directionToSkip != Direction.Top)
-                basinCount += Basins(x, y, Direction.Top, input, visited);
+                basinCount += Basins(x, y, Direction.Down, input, visited, (x, y) => y > 0, (x, y) => (x, y - 1));
             if (directionToSkip != Direction.Left)
-                basinCount += Basins(x, y, Direction.Left, input, visited);
+                basinCount += Basins(x, y, Direction.Right, input, visited, (x, y) => x > 0, (x, y) => (x - 1, y));
 
             return basinCount;
         }
@@ -93,82 +84,27 @@ namespace adventofcode2021.Day9
         private int Basins(
             int x,
             int y,
-            Direction direction,
-            Dictionary<(int X, int Y), (int Value, List<(int, int)> Neighbours)> input,
-            HashSet<(int X, int Y)> visited)
+            Direction oppositeDirection,
+            Dictionary<(int X, int Y), int> input,
+            HashSet<(int X, int Y)> visited,
+            Func<int, int, bool> loopOperation,
+            Func<int, int, (int, int)> incrementOperation)
         {
             var count = 0;
 
-            switch (direction)
+            while (loopOperation(x, y))
             {
-                case Direction.Top:
-                    while (y > 0)
-                    {
-                        y--;
-                        if (visited.Contains((x, y)))
-                            break;
-
-                        if (input[(x, y)].Value != 9)
-                        {
-                            count++;
-                            visited.Add((x, y));
-                            count += BasinCount(x, y, input, Direction.Down, visited);
-                        }
-                        break;
-                    }
+                (x, y) = incrementOperation(x, y);
+                if (visited.Contains((x, y)))
                     break;
-                case Direction.Down:
-                    while (y < _columnLength - 1)
-                    {
-                        y++;
-                        if (visited.Contains((x, y)))
-                            break;
 
-                        if (input[(x, y)].Value != 9)
-                        {
-                            count++;
-                            visited.Add((x, y));
-                            count += BasinCount(x, y, input, Direction.Top, visited);
-                        }
-                        break;
-                    }
-                    break;
-                case Direction.Left:
-                    while (x > 0)
-                    {
-                        x--;
-                        if (visited.Contains((x, y)))
-                            break;
-
-                        if (input[(x, y)].Value != 9)
-                        {
-                            count++;
-                            visited.Add((x, y));
-
-                            count += BasinCount(x, y, input, Direction.Right, visited);
-                        }
-                        break;
-                    }
-                    break;
-                case Direction.Right:
-                    while (x < _rowLength - 1)
-                    {
-                        x++;
-                        if (visited.Contains((x, y)))
-                            break;
-
-                        if (input[(x, y)].Value != 9)
-                        {
-                            count++;
-                            visited.Add((x, y));
-
-                            count += BasinCount(x, y, input, Direction.Left, visited);
-                        }
-                        break;
-                    }
-                    break;
-                default:
-                    break;
+                if (input[(x, y)] != 9)
+                {
+                    count++;
+                    visited.Add((x, y));
+                    count += BasinCount(x, y, input, oppositeDirection, visited);
+                }
+                break;
             }
 
             return count;
@@ -181,7 +117,6 @@ namespace adventofcode2021.Day9
             Down,
             Left,
             Right
-
         }
     }
 }
