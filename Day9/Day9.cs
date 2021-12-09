@@ -12,7 +12,7 @@ namespace adventofcode2021.Day9
         internal void Execute()
         {
             Console.WriteLine("Day 9:");
-            
+
             var lines = ReadInput(nameof(Day9));
             var input = lines
                 .Select(s => s.ToCharArray())
@@ -24,7 +24,7 @@ namespace adventofcode2021.Day9
 
             var riskLevel = 0;
             var basins = new List<int>();
-            var visisted = new HashSet<(int X, int Y)>();
+            var visited = new HashSet<(int X, int Y)>();
 
             for (int x = 0; x < lines.First().Length; x++)
             {
@@ -39,18 +39,15 @@ namespace adventofcode2021.Day9
                         IsLower(FindValue(x + 1, y), value))
                     {
                         riskLevel += (value + 1);
-
-                        var basinCount = 1;
-                        visisted.Add((x, y));
-                        basinCount += BasinCount(x, y, input, Direction.None, visisted);
-                        basins.Add(basinCount);
+                        visited.Add((x, y));
+                        basins.Add(CountBasin(x, y, input, visited) + 1);
                     }
 
-                    bool IsLower(int? neighbour, int value)
-                     => !neighbour.HasValue ? true : neighbour.Value > value;
+                    bool IsLower(int? neighbour, int value) => !neighbour.HasValue
+                            ? true
+                            : neighbour.Value > value;
 
-                    int? FindValue(int x, int y)
-                     => input.TryGetValue((x, y), out var downFound)
+                    int? FindValue(int x, int y) => input.TryGetValue((x, y), out var downFound)
                             ? downFound
                             : null;
                 }
@@ -60,63 +57,38 @@ namespace adventofcode2021.Day9
             SecondSolution(basins.OrderByDescending(o => o).Take(3).Aggregate((a, b) => a * b).ToString());
         }
 
-        private int BasinCount(
-            int x,
+        private int Basins(int x,
             int y,
-            Dictionary<(int X, int Y), int> input,
-            Direction directionToSkip,
-            HashSet<(int X, int Y)> visited)
-        {
-            var basinCount = 0;
-
-            if (directionToSkip != Direction.Down)
-                basinCount += Basins(x, y, Direction.Top, input, visited, (x, y) => y < _columnLength - 1, (x, y) => (x, y + 1));
-            if (directionToSkip != Direction.Right)
-                basinCount += Basins(x, y, Direction.Left, input, visited, (x, y) => x < _rowLength - 1, (x, y) => (x + 1, y));
-            if (directionToSkip != Direction.Top)
-                basinCount += Basins(x, y, Direction.Down, input, visited, (x, y) => y > 0, (x, y) => (x, y - 1));
-            if (directionToSkip != Direction.Left)
-                basinCount += Basins(x, y, Direction.Right, input, visited, (x, y) => x > 0, (x, y) => (x - 1, y));
-
-            return basinCount;
-        }
-
-        private int Basins(
-            int x,
-            int y,
-            Direction oppositeDirection,
             Dictionary<(int X, int Y), int> input,
             HashSet<(int X, int Y)> visited,
             Func<int, int, bool> loopOperation,
             Func<int, int, (int, int)> incrementOperation)
         {
             var count = 0;
-
             while (loopOperation(x, y))
             {
                 (x, y) = incrementOperation(x, y);
-                if (visited.Contains((x, y)))
+                if (visited.Contains((x, y)) || input[(x, y)] == 9)
                     break;
 
-                if (input[(x, y)] != 9)
-                {
-                    count++;
-                    visited.Add((x, y));
-                    count += BasinCount(x, y, input, oppositeDirection, visited);
-                }
-                break;
+                visited.Add((x, y));
+                count += CountBasin(x, y, input, visited) + 1;
             }
 
             return count;
         }
-
-        public enum Direction
+        private int CountBasin(int x,
+            int y,
+            Dictionary<(int X, int Y), int> input,
+            HashSet<(int X, int Y)> visited)
         {
-            None,
-            Top,
-            Down,
-            Left,
-            Right
+            var basinCount = 0;
+            basinCount += Basins(x, y, input, visited, (x, y) => y < _columnLength - 1, (x, y) => (x, y + 1));
+            basinCount += Basins(x, y, input, visited, (x, y) => x < _rowLength - 1, (x, y) => (x + 1, y));
+            basinCount += Basins(x, y, input, visited, (x, y) => y > 0, (x, y) => (x, y - 1));
+            basinCount += Basins(x, y, input, visited, (x, y) => x > 0, (x, y) => (x - 1, y));
+            return basinCount;
         }
+
     }
 }
