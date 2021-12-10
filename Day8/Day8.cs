@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace adventofcode2021.Day8
 {
@@ -13,30 +11,11 @@ namespace adventofcode2021.Day8
             Console.WriteLine("Day 8:");
             var input = ReadInput(nameof(Day8));
 
-            var segmentDecoder = new Dictionary<int, char[]>()
-            {
-                {0, new char[6] { 'a', 'b', 'c', 'e', 'f', 'g' } },
-                {1, new char[2] { 'c', 'f' } },
-                {2, new char[5] { 'a', 'c', 'd', 'e', 'g' } },
-                {3, new char[5] { 'a', 'c', 'd', 'f', 'g' } },
-                {4, new char[4] { 'b', 'c', 'd', 'f' } },
-                {5, new char[5] { 'a', 'b', 'd', 'f', 'g' } },
-                {6, new char[6] { 'a', 'b', 'd', 'e', 'f', 'g' } },
-                {7, new char[3] { 'a', 'c', 'f' } },
-                {8, new char[7] { 'a', 'b', 'c','d', 'e', 'f', 'g' } },
-                {9, new char[6] { 'a', 'b', 'c', 'd', 'f', 'g' } }
-            };
-
-            var segementPart1 = segmentDecoder
-                .GroupBy(g => g.Value.Length)
-                .Where(w => w.Count() == 1)
-                .SelectMany(s => s.Select(s => s.Value.Length))
-                .ToList();
-
-            var inputPart1 = input.Select(s => s.Split("|", StringSplitOptions.RemoveEmptyEntries).Last())
+            var inputPart1 = input
+                .Select(s => s.Split("|", StringSplitOptions.RemoveEmptyEntries).Last())
                 .SelectMany(s => s.Split(" ", StringSplitOptions.RemoveEmptyEntries));
 
-            FirstSolution(inputPart1.Count(c => segementPart1.Contains(c.Length)).ToString());
+            FirstSolution(inputPart1.Count(c => new int[4]{2, 3, 4, 7}.Contains(c.Count())).ToString());
 
             var inputPart2 = input.Select(s => new Segment(s).Compute()).Sum();
 
