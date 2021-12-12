@@ -15,17 +15,25 @@ namespace adventofcode2021.Day12
 
             var graph = BuildGraph(ReadInput(nameof(Day12)).Select(s => s.Split("-")).ToList());            
 
-            var result = FindPaths(
+            var resultPartOne = FindPaths(
                 current: graph.Single(s => s.Value == "start"),
                 ending: graph.Single(s => s.Value == "end"),
-                visited: new List<Node>());
+                visited: new List<Node>(),
+                isPartTwo: false);
 
             Console.WriteLine($"Part 1 took {sw.ElapsedMilliseconds} ms"); 
-            FirstSolution(result.ToString());
+            FirstSolution(resultPartOne.ToString());
 
-            // Console.WriteLine($"Part 2 took {sw.ElapsedMilliseconds} ms"); 
-            // SecondSolution(string.Empty);
-            sw.Stop();
+            graph = BuildGraph(ReadInput(nameof(Day12)).Select(s => s.Split("-")).ToList());            
+
+            var resultPartTwo = FindPaths(
+                current: graph.Single(s => s.Value == "start"),
+                ending: graph.Single(s => s.Value == "end"),
+                visited: new List<Node>(),
+                isPartTwo: true);
+
+            Console.WriteLine($"Part 2 took {sw.ElapsedMilliseconds} ms"); 
+            SecondSolution(resultPartTwo.ToString());
         }
 
         private List<Node> BuildGraph(List<string[]> lines){
@@ -50,18 +58,21 @@ namespace adventofcode2021.Day12
             return graph;
         }
 
-        private int FindPaths(Node current, Node ending, List<Node> visited)
+        private int FindPaths(Node current, Node ending, List<Node> visited, bool isPartTwo)
         {
-            var canBeVisited = visited.LastOrDefault(s => s.Value == current.Value)?.CanBeVisited;
+            var visitedBeforeNode = visited.LastOrDefault(s => s.Value == current.Value);
+            var canBeVisited = visitedBeforeNode?.CanBeVisited(isPartTwo) ?? true;
 
             // If current node occurs in our visited collection and it can't be visited, end this path without finding the end node.
-            if(canBeVisited.HasValue && canBeVisited.Value == false)
+            if(!canBeVisited)
                 return 0;
             
             // End node is found, return increment of paths found.
-            // Console.WriteLine(string.Join(",", visited.Select(s => s.Value)));
-            if(current.Value == ending.Value)
+            if(current.Value == ending.Value){
+
+            Console.WriteLine(string.Join(",", visited.Select(s => s.Value)));
                 return 1;
+            }
 
             current.MarkAsVisited();            
             visited.Add(current);
@@ -70,14 +81,14 @@ namespace adventofcode2021.Day12
 
             var adjCanBeVisited  = current.Adjecents
                 .Where(w =>  !visited
-                    .Where(w => !w.CanBeVisited)
+                    .Where(w => !w.CanBeVisited(isPartTwo))
                     .Select(s => s.Value)
                     .Contains(w.Value))
                 .ToList();
 
             // Create new visited list to separate different paths so we don't overwrite another path with visited nodes and continue recursively.
             foreach (var adj in adjCanBeVisited)
-                count += FindPaths(adj, ending, visited.Select(s => s).ToList());
+                count += FindPaths(adj, ending, visited.Select(s => s).ToList(), isPartTwo);
 
             return count;
         }
@@ -86,10 +97,11 @@ namespace adventofcode2021.Day12
     internal class Node {
         private string _value;
         private List<Node> _adjecentNodes = new();
-        public bool Visited { get; private set; }
+        private int InternalVisitCount = 0;
         public string Value => _value;
         public ImmutableList<Node> Adjecents => _adjecentNodes.ToImmutableList();
         public bool CanOnlyBeVistedOnce => _value.All(a => char.IsLower(a));
+        public bool CanOnlyBeVisitedTwice => _value != "start" && Value != "end" && _value.All(a => char.IsLower(a));
         public Node(string value)
          => _value = value;
 
@@ -97,8 +109,12 @@ namespace adventofcode2021.Day12
          => _adjecentNodes.Add(node);
 
         public void MarkAsVisited()
-         => Visited = true;
+         => InternalVisitCount += 1;
 
-        public bool CanBeVisited => !(CanOnlyBeVistedOnce && Visited);
+        public bool CanBeVisited(bool partTwo){
+            return partTwo
+                ? !(CanOnlyBeVisitedTwice && InternalVisitCount > 1)
+                : !(CanOnlyBeVistedOnce && InternalVisitCount > 0);
+        }
     }
 }
