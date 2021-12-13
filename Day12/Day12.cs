@@ -3,44 +3,39 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace adventofcode2021.Day12
 {
     internal class Day12 : BaseDay
     {
-        private List<string> AllVisits = new List<string>();
         internal void Execute()
         {
             Console.WriteLine(nameof(Day12));
             var sw = Stopwatch.StartNew();
 
-            var graph = BuildGraph(ReadInput(nameof(Day12)).Select(s => s.Split("-")).ToList());            
+            FirstSolution(Run(false).ToString());
+            Console.WriteLine($"Part 1 took {sw.ElapsedMilliseconds} ms");
 
-            var resultPartOne = FindPaths(
-                current: graph.Single(s => s.Value == "start"),
-                ending: graph.Single(s => s.Value == "end"),
-                visited: new List<Node>(),
-                isPartTwo: false);
+            sw.Restart();
 
-            Console.WriteLine($"Part 1 took {sw.ElapsedMilliseconds} ms"); 
-            FirstSolution(resultPartOne.ToString());
+            SecondSolution(Run(true).ToString());
+            Console.WriteLine($"Part 2 took {sw.ElapsedMilliseconds} ms");
 
-            graph = BuildGraph(ReadInput(nameof(Day12)).Select(s => s.Split("-")).ToList());            
+            int Run(bool isPartTwo)
+            {
+                var graph = BuildGraph(ReadInput(nameof(Day12)).Select(s => s.Split("-")).ToList());
+                var lookup = ReadInput(nameof(Day12)).Select(s => s.Split("-")).SelectMany(s => s).Distinct().ToDictionary(d => d, d => 0);
 
-            var resultPartTwo = FindPaths(
-                current: graph.Single(s => s.Value == "start"),
-                ending: graph.Single(s => s.Value == "end"),
-                visited: new List<Node>(),
-                isPartTwo: true);
-
-            Console.WriteLine($"All visists: {AllVisits.Distinct().Count()}");
-
-            Console.WriteLine($"Part 2 took {sw.ElapsedMilliseconds} ms"); 
-            SecondSolution(resultPartTwo.ToString());
+                return FindPaths(
+                    current: graph.Single(s => s.Value == "start"),
+                    endingNode: "end",
+                    isPartTwo,
+                    lookup);
+            }
         }
 
-        private List<Node> BuildGraph(List<string[]> lines){
+        private List<Node> BuildGraph(List<string[]> lines)
+        {
             var graph = new List<Node>();
 
             lines
@@ -49,7 +44,8 @@ namespace adventofcode2021.Day12
                 .ToList()
                 .ForEach(f => graph.Add(new Node(f)));
 
-            lines.ForEach(line => {
+            lines.ForEach(line =>
+            {
                 var firstNode = graph
                     .Single(s => s.Value == line.First());
                 var lastNode = graph
@@ -62,93 +58,80 @@ namespace adventofcode2021.Day12
             return graph;
         }
 
-        private int FindPaths(Node current, Node ending, List<Node> visited, bool isPartTwo)
+        private int FindPaths(Node current, string endingNode, bool isPartTwo, Dictionary<string, int> lookup)
         {
-            var visitedBeforeNode = visited.LastOrDefault(s => s.Value == current.Value);
-            var canBeVisited = true;
-            if(!isPartTwo){
-                canBeVisited = visitedBeforeNode?.CanBeVisited(isPartTwo) ?? true;
-            }else{
+            if (current.IsStartingOrEnd && lookup[current.Value] > 0)
+                return 0;
 
-                if(visited.Count(c => c.CanOnlyBeVisitedTwice && c.Visited) > 0 && current.CanOnlyBeVisitedTwice)
-
-                var visitedCount = 0;
-                foreach (var node in visited.Where(w => w.Value == current.Value))
-                {
-                    if(!node.CanBeVisited(isPartTwo))
-                        visitedCount++;
-                }
-
-                if(visitedCount > 1){
-                    canBeVisited = false;
-                }
-            }
-
-            // Can only visit start ONCE
-            if(visited.Any(s => s.Value == "start") && current.Value == "start")
+            // Small cave has already been visited, can't continue with small cave
+            if (isPartTwo && 
+                current.CanOnlyBeVisitedTwice && 
+                GetAllSmallCaves(lookup).Any(a => a.Value > 1) && 
+                lookup[current.Value] == 1)
                 return 0;
 
             // If current node occurs in our visited collection and it can't be visited, end this path without finding the end node.
-            if(!canBeVisited)
+            var canBeVisited = !(lookup[current.Value] > 0 && current.CanOnlyBeVistedOnce);
+            if (!isPartTwo && !canBeVisited)
                 return 0;
 
-            current.MarkAsVisited();            
-            visited.Add(current);
-            
+            current.MarkAsVisited();
+            lookup[current.Value] += 1;
+
             // End node is found, return increment of paths found.
-            if(current.Value == ending.Value){
-                if(isPartTwo){
-                    AllVisits.Add(string.Join(",", visited.Select(s => s.Value)));
-                }
-                Console.WriteLine(string.Join(",", visited.Select(s => s.Value)));
+            if (current.Value == endingNode)
                 return 1;
-            }
 
-            var count = 0;
-
-
-            var adjCanBeVisited = new List<Node>();
-            if(!isPartTwo){
-                adjCanBeVisited  = current.Adjecents
-                    .Where(w =>  !visited
-                        .Where(w => !w.CanBeVisited(isPartTwo))
-                        .Select(s => s.Value)
-                        .Contains(w.Value))
+            var adjCanBeVisited = current.Adjecents
+                    .Where(w => !(lookup[w.Value] > 0 && w.CanOnlyBeVistedOnce))
                     .ToList();
-            }else{
 
-            foreach (var curAdj in current.Adjecents)
+            if (isPartTwo)
             {
-                var innerCount = 0;
-                var visitedBefore = visited.Where(w => w.Value == curAdj.Value);
-                foreach (var node in visitedBefore)
+                adjCanBeVisited.Clear();
+
+                foreach (var curAdj in current.Adjecents)
                 {
-                    if(!node.CanBeVisited(isPartTwo))
-                        innerCount++;
+                    if (curAdj.IsStartingOrEnd && lookup[curAdj.Value] < 1)
+                        adjCanBeVisited.Add(curAdj);
+
+                    if (curAdj.IsStartingOrEnd && lookup[curAdj.Value] == 1)
+                        continue;
+
+                    if (GetAllSmallCaves(lookup).Any(a => a.Value > 1) && curAdj.CanOnlyBeVisitedTwice && lookup[curAdj.Value] > 0)
+                        continue;
+
+                    // Big cave, can always be visited, or small cave only visited once
+                    adjCanBeVisited.Add(curAdj);
                 }
-
-                 if(innerCount < 2){
-                  adjCanBeVisited.Add(curAdj);
-                 }                
-            }
             }
 
-            // Create new visited list to separate different paths so we don't overwrite another path with visited nodes and continue recursively.
-            foreach (var adj in adjCanBeVisited)
-                count += FindPaths(adj, ending, visited.Select(s => s).ToList(), isPartTwo);
+            return adjCanBeVisited
+                .Distinct()
+                .Select(adj => FindPaths(
+                    adj, 
+                    endingNode, 
+                    isPartTwo, 
+                    lookup.ToDictionary(d => d.Key, d => d.Value)))
+                .Sum();
 
-            return count;
+            List<KeyValuePair<string, int>> GetAllSmallCaves(Dictionary<string, int> lookup)
+                => lookup.Where(w => w.Key.All(a => char.IsLower(a)) && w.Key != "start" && w.Key != "end").ToList();
         }
     }
 
-    internal class Node {
+    internal class Node
+    {
         private string _value;
         private List<Node> _adjecentNodes = new();
-        public bool Visited {get; private set; }
+        private bool _visited;
         public string Value => _value;
         public ImmutableList<Node> Adjecents => _adjecentNodes.ToImmutableList();
         public bool CanOnlyBeVistedOnce => _value.All(a => char.IsLower(a));
         public bool CanOnlyBeVisitedTwice => _value != "start" && Value != "end" && _value.All(a => char.IsLower(a));
+        public bool IsStartingOrEnd => _value == "start" || _value == "end";
+        public bool CanBeVisited
+         => CanOnlyBeVistedOnce ? !_visited : true;
         public Node(string value)
          => _value = value;
 
@@ -156,27 +139,6 @@ namespace adventofcode2021.Day12
          => _adjecentNodes.Add(node);
 
         public void MarkAsVisited()
-         => Visited = true;
-
-        //  public bool CanBeVisitedPartTwo
-        //     => CanOnlyBeVisitedTwice && InternalVisitCount < 1;
-
-        public bool CanBeVisited(bool partTwo)
-        {
-            if(!partTwo){
-                if(CanOnlyBeVistedOnce){
-                    return !Visited;
-                }
-                return true;
-            }
-
-            if(Visited && _value == "start" || Visited && _value == "end")
-                return false;
-
-            if(!CanOnlyBeVisitedTwice)
-                return true;
-
-            return !Visited;            
-        }
+         => _visited = true;
     }
 }
