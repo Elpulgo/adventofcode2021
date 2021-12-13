@@ -94,8 +94,6 @@ How many paths through this cave system are there that visit small caves at most
 
 Your puzzle answer was 5254.
 
-The first half of this puzzle is complete! It provides one gold star: *
-
 --- Part Two ---
 After reviewing the available paths, you realize you might have time to visit a single small cave twice. Specifically, big caves can be visited any number of times, a single small cave can be visited at most twice, and the remaining small caves can be visited at most once. However, the caves named start and end can only be visited exactly once each: once you leave the start cave, you may not return to it, and once you reach the end cave, the path must end immediately.
 
@@ -140,3 +138,7 @@ start,b,end
 The slightly larger example above now has 103 paths through it, and the even larger example now has 3509 paths through it.
 
 Given these new rules, how many paths through this cave system are there?
+
+Your puzzle answer was 149385.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
