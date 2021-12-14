@@ -1,36 +1,92 @@
-﻿using System;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace adventofcode2021.Day14
 {
     internal class Day14 : BaseDay
     {
-        private Dictionary<string, char> _operations;
+        private Dictionary<string, char> _operations = new();
+        private Dictionary<char, int> _count = new();
+        private Queue<(char First, char Second, int Increment)> _queue = new();
+
         public Day14(bool shouldPrint) : base(nameof(Day14), shouldPrint) { }
+
         public override void Execute()
         {
+
             var input = ReadInput();
+            var template = input.First();
             base.StartTimerOne();
 
             _operations = input.Skip(1).Where(w => w != string.Empty)
                 .Select(s => s.Split("->", StringSplitOptions.TrimEntries))
                 .ToDictionary(k => k[0].Trim(), v => char.Parse(v[1]));
 
-            var chars = input.First().ToCharArray();
+            var chars = template.ToCharArray();
 
-            for(var i = 0; i < 10; i++) { 
+            for (var i = 0; i < 10; i++)
                 chars = Step(chars).ToArray();
-            }
 
-            base.StopTimerOne();            
+            base.StopTimerOne();
 
-            var group = chars.GroupBy(g => g).OrderByDescending(o => o.Count());
+            var group = chars
+                .GroupBy(g => g)
+                .OrderByDescending(o => o.Count());
+
             FirstSolution((group.First().Count() - group.Last().Count()).ToString());
 
-            //Console.WriteLine($"Part 2 took {sw.ElapsedMilliseconds} ms");
-            //SecondSolution(string.Empty);
+            // Solution 2 - had to get hints at other solutions, couldn't compute xD
+            base.StartTimerTwo();
+
+            var charCount = template
+                .ToCharArray()
+                .GroupBy(g => g)
+                .ToDictionary(k => k.Key, v => (long)v.Count());
+
+            var pairs = Enumerable.Range(0, template.Length - 1)
+                .Select((c => template[c..(c + 2)]))
+                .GroupBy(g => g)
+                .ToDictionary(k => k.Key, v => (long)v.Count());
+
+            var steps = 0;
+            while (steps != 40)
+            {
+                var newPairs = new Dictionary<string, long>();
+                
+                foreach (var pair in pairs)
+                {
+                    var newChar = _operations[pair.Key];
+                    var newPair1 = $"{pair.Key[0]}{newChar}";
+                    var newPair2 = $"{newChar}{pair.Key[1]}";
+
+                    if (!charCount.ContainsKey(newChar))
+                        charCount.Add(newChar, 1);
+                    else
+                        charCount[newChar] += pair.Value;
+
+
+                    if (newPairs.ContainsKey(newPair1))
+                        newPairs[newPair1] += pair.Value;
+                    else
+                        newPairs.Add(newPair1, pair.Value);
+                    
+
+                    if (newPairs.ContainsKey(newPair2))
+                        newPairs[newPair2] += pair.Value;
+                    else
+                        newPairs.Add(newPair2, pair.Value);
+
+                }
+                pairs = new Dictionary<string, long>(newPairs);
+                steps++;
+            }
+
+            base.StopTimerTwo();
+            SecondSolution((charCount.Max(m => m.Value) - charCount.Min(m => m.Value)).ToString());
         }
 
         private IEnumerable<char> Step(char[] chars)
