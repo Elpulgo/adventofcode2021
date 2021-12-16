@@ -12,6 +12,8 @@ namespace adventofcode2021.Helpers
 
         public bool HasValue => _internal.Any();
 
+        public int Count => _internal.Count;
+
         public void Enqueue(T item){
             _internal.Add(item);
             BubbleUp();
