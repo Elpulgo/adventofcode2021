@@ -6,10 +6,12 @@ namespace adventofcode2021.Day8
 {
     internal class Day8 : BaseDay
     {
-        internal void Execute()
+        public Day8(bool shouldPrint): base(nameof(Day8), shouldPrint) {}
+
+        public override void Execute()
         {
             Console.WriteLine("Day 8:");
-            var input = ReadInput(nameof(Day8));
+            var input = ReadInput();
 
             var inputPart1 = input
                 .Select(s => s.Split("|", StringSplitOptions.RemoveEmptyEntries).Last())

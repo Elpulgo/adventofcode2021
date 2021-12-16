@@ -7,12 +7,14 @@ namespace adventofcode2021.Day13
 {
     internal class Day13 : BaseDay
     {
-        internal void Execute()
+        public Day13(bool shouldPrint) : base(nameof(Day13), shouldPrint) { }
+        
+        public override void Execute()
         {
             Console.WriteLine(nameof(Day13));
             var sw = Stopwatch.StartNew();
 
-            var input = ReadInput(nameof(Day13));
+            var input = ReadInput();
             var (coords, folds) = Setup(input);
 
             Fold(folds.First().Axis, folds.First().Value, coords);

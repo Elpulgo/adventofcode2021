@@ -5,7 +5,9 @@ namespace adventofcode2021.Day7
 {
     internal class Day7 : BaseDay
     {
-        internal void Execute()
+        public Day7(bool shouldPrint): base(nameof(Day7), shouldPrint) {}
+
+        public override void Execute()
         {
             Console.WriteLine("Day 7:");
 
@@ -15,7 +17,7 @@ namespace adventofcode2021.Day7
 
         private int InternalExecute(bool isPartTwo)
         {
-            var input = ReadInput(nameof(Day7))
+            var input = ReadInput()
                 .First()
                 .Split(",", StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => Convert.ToInt32(s))

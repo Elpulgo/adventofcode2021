@@ -9,7 +9,9 @@ namespace Advent.Day5
 {
     internal class Day5: BaseDay
     {
-        internal void Execute()
+        public Day5(bool shouldPrint): base(nameof(Day5), shouldPrint) {}
+
+        public override void Execute()
         {
             Console.WriteLine("Day 5:");
 
@@ -21,7 +23,7 @@ namespace Advent.Day5
         {
             var coords = new Dictionary<(int, int), int>();
 
-            ReadInput(nameof(Day5))
+            ReadInput()
                 .ToList()
                 .Select(line =>
                 {

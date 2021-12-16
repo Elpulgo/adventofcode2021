@@ -8,29 +8,34 @@ namespace adventofcode2021.Day12
 {
     internal class Day12 : BaseDay
     {
-        internal void Execute()
+        public Day12(bool shouldPrint): base(nameof(Day12), shouldPrint) {}
+        public override void Execute()
         {
-            Console.WriteLine(nameof(Day12));
-            var sw = Stopwatch.StartNew();
-
             FirstSolution(Run(false).ToString());
-            Console.WriteLine($"Part 1 took {sw.ElapsedMilliseconds} ms");
-
-            sw.Restart();
-
             SecondSolution(Run(true).ToString());
-            Console.WriteLine($"Part 2 took {sw.ElapsedMilliseconds} ms");
 
             int Run(bool isPartTwo)
             {
-                var graph = BuildGraph(ReadInput(nameof(Day12)).Select(s => s.Split("-")).ToList());
-                var lookup = ReadInput(nameof(Day12)).Select(s => s.Split("-")).SelectMany(s => s).Distinct().ToDictionary(d => d, d => 0);
+                var graph = BuildGraph(ReadInput().Select(s => s.Split("-")).ToList());
+                var lookup = ReadInput().Select(s => s.Split("-")).SelectMany(s => s).Distinct().ToDictionary(d => d, d => 0);
 
-                return FindPaths(
+                if(!isPartTwo)
+                    base.StartTimerOne();
+                else 
+                    base.StartTimerTwo();
+
+                var paths = FindPaths(
                     current: graph.Single(s => s.Value == "start"),
                     endingNode: "end",
                     isPartTwo,
                     lookup);
+
+                if(!isPartTwo)
+                    base.StopTimerOne();
+                else 
+                    base.StopTimerTwo();
+
+                return paths;
             }
         }
 

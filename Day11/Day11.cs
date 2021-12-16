@@ -7,13 +7,15 @@ namespace adventofcode2021.Day11
 {
     internal class Day11 : BaseDay
     {
+        public Day11(bool shouldPrint): base(nameof(Day11), shouldPrint) {}
+
         private Dictionary<(int X, int Y), int> _matrix = new();
 
-        internal void Execute()
+        public override void Execute()
         {
             Console.WriteLine(nameof(Day11));
 
-            var lines = ReadInput(nameof(Day11)).Select(s => s.ToCharArray().Select(s => Convert.ToInt32(s - '0')).ToList()).ToList();
+            var lines = ReadInput().Select(s => s.ToCharArray().Select(s => Convert.ToInt32(s - '0')).ToList()).ToList();
             var sw = Stopwatch.StartNew();
 
             for (var y = 0; y < lines.Count; y++)

@@ -9,11 +9,11 @@ namespace adventofcode2021.Day14
 {
     internal class Day14 : BaseDay
     {
+        public Day14(bool shouldPrint) : base(nameof(Day14), shouldPrint) { }
+
         private Dictionary<string, char> _operations = new();
         private Dictionary<char, int> _count = new();
         private Queue<(char First, char Second, int Increment)> _queue = new();
-
-        public Day14(bool shouldPrint) : base(nameof(Day14), shouldPrint) { }
 
         public override void Execute()
         {

@@ -7,11 +7,13 @@ namespace Advent
 {
     internal class Day1 : BaseDay
     {
-        internal void Execute()
+        public Day1(bool shouldPrint): base(nameof(Day1), shouldPrint) {}
+
+        public override void Execute()
         {
             Console.WriteLine("Day 1:");
 
-            var input = ReadInput(nameof(Day1))
+            var input = ReadInput()
                 .Select(s => Convert.ToInt32(s))
                 .ToList();
 

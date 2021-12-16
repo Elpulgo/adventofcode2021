@@ -5,9 +5,11 @@ namespace adventofcode2021.Day2
 {
     public class Day2 : BaseDay
     {
-        public void Execute(){
+        public Day2(bool shouldPrint): base(nameof(Day2), shouldPrint) {}
 
-            var lines = ReadInput(nameof(Day2));
+        public override void Execute(){
+
+            var lines = ReadInput();
 
             var horizontal = 0;
             var depth = 0;

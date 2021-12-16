@@ -6,6 +6,8 @@ namespace adventofcode2021.Day10
 {
     internal class Day10 : BaseDay
     {
+        public Day10(bool shouldPrint): base(nameof(Day10), shouldPrint) {}
+
         private Dictionary<char, int> ScoreCardPart1 = new() { { ')', 3 }, { ']', 57 }, { '}', 1197 }, { '>', 25137 } };
         private Dictionary<char, ulong> ScoreCardPart2 = new() { { ')', 1 }, { ']', 2 }, { '}', 3 }, { '>', 4 } };
 
@@ -17,9 +19,9 @@ namespace adventofcode2021.Day10
             { '<', '>' }
         };
 
-        internal void Execute()
+        public override void Execute()
         {
-            var lines = ReadInput(nameof(Day10)).Select(s => s.ToCharArray());
+            var lines = ReadInput().Select(s => s.ToCharArray());
             var countPartOne = 0;
             var countPartTwo = new List<ulong>();
 

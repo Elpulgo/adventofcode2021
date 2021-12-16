@@ -7,7 +7,9 @@ namespace Advent.Day6
 {
     internal class Day6 : BaseDay
     {
-        internal void Execute()
+        public Day6(bool shouldPrint): base(nameof(Day6), shouldPrint) {}
+
+        public override void Execute()
         {
             Console.WriteLine("Day 6:");
 

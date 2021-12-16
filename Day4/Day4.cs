@@ -8,12 +8,13 @@ namespace Advent.Day4
 {
     internal class Day4: BaseDay
     {
-        internal void Execute()
+        public Day4(bool shouldPrint): base(nameof(Day4), shouldPrint) {}
+
+        public override void Execute()
         {
             Console.WriteLine("Day 4:");
             
-            var input = ReadInput(nameof(Day4))
-                .ToList();
+            var input = ReadInput().ToList();
 
             var bingoSequence = input
                 .First()

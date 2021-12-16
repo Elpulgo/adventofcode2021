@@ -6,14 +6,16 @@ namespace adventofcode2021.Day9
 {
     internal class Day9 : BaseDay
     {
+        public Day9(bool shouldPrint): base(nameof(Day9), shouldPrint) {}
+
         private int _rowLength = 0;
         private int _columnLength = 0;
 
-        internal void Execute()
+        public override void Execute()
         {
             Console.WriteLine("Day 9:");
 
-            var lines = ReadInput(nameof(Day9));
+            var lines = ReadInput();
             var input = lines
                 .Select(s => s.ToCharArray())
                 .SelectMany((s, i) => s.Select((p, columnIndex) => new KeyValuePair<(int X, int Y), int>((columnIndex, i), Convert.ToInt32(p - '0'))))
