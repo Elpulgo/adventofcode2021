@@ -27,7 +27,7 @@ namespace adventofcode2021.Day16
             // TEST
             binaryInput = String.Join(
                 "",
-                string.Join("", "38006F45291200").Select(
+                string.Join("", "EE00D40C823060").Select(
                     c => Convert.ToString(Convert.ToInt32(c.ToString(), 16), 2).PadLeft(4, '0')));
 
             base.StartTimerTwo();
@@ -37,7 +37,6 @@ namespace adventofcode2021.Day16
             {
                 if (binaryInput.Length < 6)
                     break;
-
 
                 var packet = new Packet {
                     Version = Convert.ToInt32(binaryInput.Substring(0, 3), 2),
@@ -52,18 +51,23 @@ namespace adventofcode2021.Day16
                     {
                         // Should be 27
                         var lengthOfSubPackets = Convert.ToInt32(binaryInput.Substring(7, 15), 2);
+                        var lengthOfLastPacket = lengthOfSubPackets - 11;
 
-                        // Then first 11, then 16?
-                        var apa = Convert.ToInt32("1010001010", 2);
-                        //var apa3 = 0b + apa;
-                        //var nisse = "0b11010001010";
+                        var first = DecodeLiteralPacket(binaryInput.Substring(22, 11));
+                        var last = DecodeLiteralPacket(binaryInput.Substring(33, lengthOfLastPacket));
 
-                        // while loop here -> starting 1 means continue, starting 0 means last package
-                        var nisse = binaryInput.Substring(23, 11);
-                        var subPacketOne = Convert.ToInt32(binaryInput.Substring(22, 11), 2); // 10
-                        var subPacketTwo = Convert.ToInt32(binaryInput.Substring(33, 16), 2); // 20
+                        packet.Bits.Add(Convert.ToInt32(first, 2));
+                        packet.Bits.Add(Convert.ToInt32(last, 2));
+                    } else {
+                        // Should be 27
+                        var numberOfContainedPackets = Convert.ToInt32(binaryInput.Substring(7, 11), 2);
 
+                        var packets = new List<string>();
 
+                        for (int i = 0; i < numberOfContainedPackets; i++)
+                            packets.Add(DecodeLiteralPacket(binaryInput.Substring(18 + (11 * i), 11)));
+
+                        packet.Bits.AddRange(packets.Select(s => Convert.ToInt32(s, 2)).ToList());
                     }
                 }
 
@@ -86,6 +90,28 @@ namespace adventofcode2021.Day16
                     }
 
                 }
+            }
+
+            string DecodeLiteralPacket(string input){
+                var version = input.Substring(0, 3);
+                var type = input.Substring(3, 6);
+                var result = string.Empty;
+                input = input[6..];
+
+                while (input.Length > 3)
+                {
+                    var newBits = input.Substring(0, 5);
+                    if (newBits.StartsWith("0")) {
+                        result += newBits.Substring(1, 4);
+                        return result;
+                    }
+
+                    result += newBits.Substring(1, 4);
+
+                    input = input[5..];
+                }
+
+                return result;
             }
 
             base.StopTimerTwo();
