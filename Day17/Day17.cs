@@ -30,23 +30,94 @@ namespace adventofcode2021.Day16
             yHigh = yHighToLow.First();
             yLow = yHighToLow.Last();
 
-            var position = (0, 0);
+            // var position = (0, 0);
             var steps = 0;
-            var xMove = 7;
-            var yMove = 2;
+            // var xMove = 7;
+            // var yMove = 2;
 
-            var stepsyHigh = 0 - yHigh;
-            var stepsyLow = 0 - yLow;
-            var stepsXLow = xLow / xMove;
-            var stepsXGhigh = xHigh / xMove;
+            // var stepsyHigh = 0 - yHigh;
+            // var stepsyLow = 0 - yLow;
+            // var stepsXLow = xLow / xMove;
+            // var stepsXGhigh = xHigh / xMove;
 
+            // var apa = t * (t - 1)
+            // startX = n, where n is the largest value where    n * (n + 1) / 2 < MinX
+            // 6 * (6 + 1) / 2 < 20  == 20.5
+            // 5 * (5 +1 ) / 2 < 20 == 15
 
+            var velocities = new List<(int Velocity, int StepsRequiredToMin)>();
 
-            while (!IsWithinTarget(position))
+            foreach (var probableVX in Enumerable.Range(1, 100))
             {
-                (xMove, yMove) = Step(ref position, xMove, yMove);
-                steps++;
+                var formula = probableVX * (probableVX + 1) / 2;
+                if(formula > xLow && formula < xHigh){
+                    velocities.Add((probableVX, StepsRequired(probableVX, xLow)));
+                }
+            } 
+
+            int StepsRequired(int velocity, int target){
+                int steps = 0;
+                while(target >= 0){
+                    target -= velocity;
+                    velocity--;
+                    steps++;
+                }
+
+                return steps;
             }
+
+            var maxY = 0;
+
+            foreach (var velocity in velocities)
+            {
+                for(var y = 1; y < 10; y++){
+                    var position = (0,0);
+                    var xMove = velocity.Velocity;
+                    var yMove = y;
+
+                    if(y == 9 && velocity.Velocity == 6){
+                        var nisse = string.Empty;
+                    }
+
+                    var roundMaxY = 0;
+
+                    while(!IsBeyondTarget(position, xMove)){
+                        (xMove, yMove) = Step(ref position, xMove, yMove);
+
+                        // if(IsBeyondTarget(position, xMove)){
+                        //     roundMaxY = 0;
+                        //     break;
+                        // }
+
+                        if(IsWithinTarget(position)){
+                            if(position.Item2 > maxY){
+                                maxY = position.Item2;
+                                break;
+                            }
+                        }
+                        // Console.WriteLine(position);
+                        // if(position.Item2 > roundMaxY){
+                        //     maxY = position.Item2;
+
+                        //     roundMaxY = position.Item2;
+                        // }
+                    }
+
+                    // if(roundMaxY > maxY){
+                    //     roundMaxY = maxY;
+                    // }
+                }
+            }
+
+            var apa122312 = string.Empty;
+
+
+
+            // while (!IsWithinTarget(position))
+            // {
+            //     (xMove, yMove) = Step(ref position, xMove, yMove);
+            //     steps++;
+            // }
 
             // 0 - yHigh - x == How many steps will it need till we het yHigh?
             // 0 - yLow - x == How many steps will it need till we het yLow?
@@ -61,6 +132,17 @@ namespace adventofcode2021.Day16
         private bool IsWithinTarget((int X, int Y) position)
         {
             if ((position.X <= xHigh && position.X >= xLow) && (position.Y <= yHigh && position.Y >= yLow))
+                return true;
+
+            return false;
+        }
+
+        private bool IsBeyondTarget((int X, int Y) position, int velocity)
+        {
+            if(position.Y < yLow)
+                return true;
+
+            if(position.X > xHigh || (position.X < xLow && velocity == 0))
                 return true;
 
             return false;
