@@ -38,17 +38,18 @@ namespace adventofcode2021.Day16
             var velocities = Enumerable.Range(1, 100).Where(probableVX => 
                     (probableVX * (probableVX + 1) / 2) > xLow && 
                     (probableVX * (probableVX + 1) / 2) < xHigh)
-                .Select(s => (Velocity: s, StepsRequiredToMin: StepsRequired(s, xLow)))
                 .ToList();
 
             var maxY = 0;
 
             foreach (var velocity in velocities)
             {
+                
                 // Brute force, ugly but true!
                 for(var y = 0; y < 10000; y++){
                     var position = (X: 0, Y: 0);
-                    var velocityX = velocity.Velocity;
+                    
+                    var velocityX = velocity;
                     var velocityY = y;
 
                     var probeRoundMaxY = 0;
@@ -61,14 +62,12 @@ namespace adventofcode2021.Day16
                             break;
                         }
 
-                        if(position.Y > probeRoundMaxY){
+                        if(position.Y > probeRoundMaxY)
                             probeRoundMaxY = position.Y;
-                        }
                     }
 
-                    if(probeRoundMaxY > maxY){
+                    if(probeRoundMaxY > maxY)
                         maxY = probeRoundMaxY;
-                    }
                 }
             }          
 
@@ -90,12 +89,8 @@ namespace adventofcode2021.Day16
         private bool IsWithinTarget((int X, int Y) position)
         {
             if ((position.X <= xHigh && position.X >= xLow) && 
-                (position.Y <= yHigh && position.Y >= yLow)){
-                    if(position.Y == 99){
-                        var apa = string.Empty;
-                    }
+                (position.Y <= yHigh && position.Y >= yLow))
                 return true;
-                }
 
             return false;
         }
