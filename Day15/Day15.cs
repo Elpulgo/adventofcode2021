@@ -71,8 +71,10 @@ namespace adventofcode2021.Day15
                             seen[(tX, tY)] = current.Risk + risk;
                             var newPoint = new Point(tX, tY, current.Risk + risk, current.Steps + 1);
                             newPoint._retrace = current._retrace.Concat(new List<int>() { risk }).ToList();
+                            newPoint.points = current.points.Concat(new List<(int, int)>() { (tX, tY) }).ToList();
+
                             queue.Enqueue(newPoint);
-                            Console.WriteLine($"{tX}, {tY}");
+                            // Console.WriteLine($"{tX}, {tY}");
                         }
                     }
                 }
@@ -114,6 +116,7 @@ namespace adventofcode2021.Day15
     internal record Point(int X, int Y, int Risk, int Steps) : IComparable<Point>
     {
         public List<int> _retrace = new();
+        public List<(int, int)> points = new();
         public int CompareTo(Point other)
         {
             int comp = Risk.CompareTo(other.Risk);
@@ -139,6 +142,16 @@ namespace adventofcode2021.Day15
             }
             Console.WriteLine("###");
 
+
+            Console.WriteLine("Retrace points");
+            foreach (var tr in points)
+            {
+                Console.WriteLine(tr);
+            }
+            Console.WriteLine("###");
+
+
+            
         }
     }
 }
