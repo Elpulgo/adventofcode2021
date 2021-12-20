@@ -101,8 +101,6 @@ Find the initial velocity that causes the probe to reach the highest y position 
 
 Your puzzle answer was 17766.
 
-The first half of this puzzle is complete! It provides one gold star: *
-
 --- Part Two ---
 Maybe a fancy trick shot isn't the best idea; after all, you only have one probe, so you had better not miss.
 
@@ -124,3 +122,7 @@ In the above example, there are 112 different initial velocity values that meet 
 27,-10  7,2     30,-9   21,-8   22,-7   24,-9   20,-6   6,9     29,-5
 8,-2    27,-8   30,-5   24,-7
 How many distinct initial velocity values cause the probe to be within the target area after any step?
+
+Your puzzle answer was 1733.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
